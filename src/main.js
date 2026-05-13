@@ -5,22 +5,23 @@
 
 // Data
 const CITIES = [
-  { id: 'hangzhou', name: '杭州', teamName: '杭城竞渡队', landmark: '西湖·三潭印月', color: '#0047AB' },
-  { id: 'ningbo', name: '宁波', teamName: '甬江先锋队', landmark: '宁波港·海螺', color: '#003399' },
-  { id: 'wenzhou', name: '温州', teamName: '瓯越破浪队', landmark: '雁荡山', color: '#0055A4' },
-  { id: 'shaoxing', name: '绍兴', teamName: '越州劲旅队', landmark: '鲁迅故里·乌篷船', color: '#002868' },
-  { id: 'huzhou', name: '湖州', teamName: '南太湖勇士', landmark: '月亮酒店', color: '#006241' },
-  { id: 'jiaxing', name: '嘉兴', teamName: '南湖竞发队', landmark: '红船', color: '#BF0A30' },
-  { id: 'jinhua', name: '金华', teamName: '婺州先锋队', landmark: '八咏楼', color: '#DAA520' },
-  { id: 'quzhou', name: '衢州', teamName: '三衢猛将队', landmark: '南孔圣地', color: '#2E8B57' },
-  { id: 'zhoushan', name: '舟山', teamName: '千岛巨浪队', landmark: '跨海大桥', color: '#1E90FF' },
-  { id: 'taizhou', name: '台州', teamName: '和合破浪队', landmark: '天台山', color: '#FF7F00' },
-  { id: 'lishui', name: '丽水', teamName: '处州腾龙队', landmark: '古堰画乡', color: '#228B22' },
+  { id: 'hangzhou', name: '杭州', teamName: '杭城竞渡队', landmark: '西湖·三潭印月', color: '#0047AB', participation: 15420 },
+  { id: 'ningbo', name: '宁波', teamName: '甬江先锋队', landmark: '宁波港·海螺', color: '#003399', participation: 12850 },
+  { id: 'wenzhou', name: '温州', teamName: '瓯越破浪队', landmark: '雁荡山', color: '#0055A4', participation: 11200 },
+  { id: 'shaoxing', name: '绍兴', teamName: '越州劲旅队', landmark: '鲁迅故里·乌篷船', color: '#002868', participation: 14900 },
+  { id: 'huzhou', name: '湖州', teamName: '南太湖勇士', landmark: '月亮酒店', color: '#006241', participation: 9800 },
+  { id: 'jiaxing', name: '嘉兴', teamName: '南湖竞发队', landmark: '红船', color: '#BF0A30', participation: 13500 },
+  { id: 'jinhua', name: '金华', teamName: '婺州先锋队', landmark: '八咏楼', color: '#DAA520', participation: 8700 },
+  { id: 'quzhou', name: '衢州', teamName: '三衢猛将队', landmark: '南孔圣地', color: '#2E8B57', participation: 7600 },
+  { id: 'zhoushan', name: '舟山', teamName: '千岛巨浪队', landmark: '跨海大桥', color: '#1E90FF', participation: 10500 },
+  { id: 'taizhou', name: '台州', teamName: '和合破浪队', landmark: '天台山', color: '#FF7F00', participation: 9200 },
+  { id: 'lishui', name: '丽水', teamName: '处州腾龙队', landmark: '古堰画乡', color: '#228B22', participation: 6800 },
 ];
 
 // App State
 let state = {
   currentPage: 'home', // home, select, game, result, rankings
+  rankingTab: 'speed', // speed, popularity
   selectedTeam: null,
   game: {
     distance: 0,
@@ -34,7 +35,11 @@ let state = {
     countdown: 3,
     interval: null
   },
-  lastResult: null
+  lastResult: {
+    time: 0,
+    distance: 0,
+    score: 0
+  }
 };
 
 const stage = document.getElementById('stage');
@@ -123,8 +128,10 @@ function endGame() {
 
 // Rendering Engine
 function render() {
-  // Always ensure base stage classes
-  stage.className = "stage";
+  // 确保 stage 始终有基准样式
+  if (!stage.classList.contains('stage')) {
+    stage.className = "stage";
+  }
   stage.innerHTML = '';
   
   switch(state.currentPage) {
@@ -148,33 +155,40 @@ function render() {
 
 function renderHome() {
   stage.innerHTML = `
-    <div class="h-full bg-gradient-to-b from-[#0047AB] to-[#002868] flex flex-col items-center justify-between p-8 pb-16 text-white overflow-hidden relative">
+    <div class="h-full bg-gradient-to-b from-[#0047AB] to-[#002868] flex flex-col items-center justify-between p-12 pb-32 text-white overflow-hidden relative">
       <div class="absolute bottom-0 left-0 w-full h-1/3 opacity-20 pointer-events-none">
         <div class="water-wave h-full w-full bg-[url('https://www.transparenttextures.com/patterns/waves.png')] animate-pulse"></div>
       </div>
-      <div class="flex flex-col items-center pt-20 z-10">
-        <div class="bg-white/10 backdrop-blur-md px-4 py-1 rounded-full text-sm font-medium mb-4 flex items-center gap-2">
-          <div class="w-2 h-2 rounded-full bg-red-500 animate-ping"></div>
+      <div class="flex flex-col items-center pt-32 z-10 w-full px-6">
+        <div class="bg-white/10 backdrop-blur-md px-8 py-3 rounded-full text-lg font-black mb-8 flex items-center gap-4 border border-white/20">
+          <div class="w-4 h-4 rounded-full bg-red-500 animate-ping shadow-[0_0_15px_#ef4444]"></div>
           浙江广电 · 中国蓝
         </div>
-        <h1 class="text-5xl font-bold text-center tracking-tighter mb-2">中国蓝龙舟赛</h1>
-        <p class="text-stone-300 text-center text-lg font-light">浙里龙舟竞风流 · 端午安康</p>
+        <h1 class="text-7xl font-black text-center tracking-tighter mb-4 drop-shadow-2xl italic leading-tight">中国蓝龙舟赛</h1>
+        <p class="text-stone-300 text-center text-2xl font-light tracking-widest opacity-80">浙里龙舟竞风流 · 端午安康</p>
       </div>
-      <div class="flex flex-col items-center w-full gap-4 z-10 px-4">
-        <button id="btn-start" class="w-full bg-[#E23D28] hover:bg-red-700 text-white font-bold py-6 rounded-2xl shadow-xl shadow-red-900/40 text-xl tracking-widest transition-transform active:scale-95">
+      
+      <div class="relative w-full h-96 flex items-center justify-center z-10">
+         <div class="boat-visual w-24 h-80 bg-red-600 rounded-full shadow-[0_30px_60px_rgba(0,0,0,0.5)] flex flex-col items-center pt-6">
+            <div class="w-4 h-4 rounded-full bg-yellow-400 mb-2 shadow-[0_0_10px_#facc15]"></div>
+         </div>
+      </div>
+
+      <div class="flex flex-col items-center w-full gap-8 z-10 px-12">
+        <button id="btn-start" class="w-full bg-[#E23D28] hover:bg-red-700 text-white font-black py-8 rounded-[40px] shadow-[0_30px_60px_-15px_rgba(226,61,40,0.6)] text-4xl tracking-[0.5em] transition-all active:scale-95 border-b-8 border-red-900/50">
           立即参赛
         </button>
-        <div class="flex gap-4 w-full">
-          <button id="btn-rank" class="flex-1 bg-white/10 backdrop-blur-md hover:bg-white/20 text-white py-4 rounded-xl flex items-center justify-center gap-2 text-sm font-medium">
+        <div class="flex gap-6 w-full">
+          <button id="btn-rank" class="flex-1 bg-white/10 backdrop-blur-md hover:bg-white/20 text-white py-6 rounded-[32px] flex items-center justify-center gap-4 text-xl font-black border border-white/10 transition-all">
             排行榜
           </button>
-          <button class="flex-1 bg-white/10 backdrop-blur-md hover:bg-white/20 text-white py-4 rounded-xl flex items-center justify-center gap-2 text-sm font-medium">
-            规则
+          <button class="flex-1 bg-white/10 backdrop-blur-md hover:bg-white/20 text-white py-6 rounded-[32px] flex items-center justify-center gap-4 text-xl font-black border border-white/10 transition-all">
+            比赛规则
           </button>
         </div>
       </div>
-      <div class="text-white/40 text-xs flex flex-col items-center gap-1 z-10">
-        <p>© 2024 浙江广播电视集团 中国蓝</p>
+      <div class="text-white/40 text-sm flex flex-col items-center gap-2 z-10">
+        <p class="font-bold tracking-widest opacity-60">© 2024 浙江广播电视集团 中国蓝</p>
       </div>
     </div>
   `;
@@ -184,29 +198,31 @@ function renderHome() {
 
 function renderSelection() {
   stage.innerHTML = `
-    <div class="h-full bg-stone-50 flex flex-col p-6 overflow-y-auto pb-10">
-      <div class="mb-8 pt-6">
-        <h2 class="text-3xl font-extrabold text-stone-900 tracking-tight">选择你的家乡战队</h2>
-        <p class="text-stone-500 mt-1">集结全省之力，为家乡荣誉而战！</p>
-      </div>
-      <div class="grid grid-cols-1 gap-4">
-        ${CITIES.map(city => `
-          <button onclick="window.selectCity('${city.id}')" class="group relative flex items-center p-4 bg-white border border-stone-200 rounded-2xl shadow-sm hover:border-blue-200 transition-all text-left overflow-hidden">
-            <div class="absolute left-0 top-0 bottom-0 w-1.5" style="background-color: ${city.color}"></div>
-            <div class="flex-1">
-              <div class="flex items-center gap-2 mb-0.5">
-                <span class="text-xl font-bold text-stone-900">${city.name}</span>
-                <span class="px-2 py-0.5 bg-stone-100 rounded text-[10px] font-bold text-stone-500 uppercase">${city.teamName}</span>
+    <div class="h-full bg-stone-50 flex flex-col items-center p-10 overflow-y-auto pb-24">
+      <div class="w-[600px]">
+        <div class="mb-10 pt-10">
+          <h2 class="text-5xl font-black text-stone-900 tracking-tighter italic">选择战队</h2>
+          <p class="text-stone-500 mt-3 text-xl font-medium">集结全省之力，为家乡荣誉而战！</p>
+        </div>
+        <div class="grid grid-cols-1 gap-5">
+          ${CITIES.map(city => `
+            <button onclick="window.selectCity('${city.id}')" class="group relative flex items-center p-8 bg-white border-2 border-stone-100 rounded-[40px] shadow-md hover:border-blue-300 hover:shadow-xl transition-all text-left overflow-hidden active:scale-95">
+              <div class="absolute left-0 top-0 bottom-0 w-3" style="background-color: ${city.color}"></div>
+              <div class="flex-1">
+                <div class="flex items-center gap-4 mb-2">
+                  <span class="text-4xl font-black text-stone-900">${city.name}</span>
+                  <span class="px-3 py-1 bg-stone-100 rounded-lg text-sm font-black text-stone-500 uppercase tracking-widest">${city.teamName}</span>
+                </div>
+                <p class="text-lg text-stone-400 font-medium">${city.landmark}</p>
               </div>
-              <p class="text-xs text-stone-400">${city.landmark}</p>
-            </div>
-            <div class="flex flex-col items-end gap-1">
-              <div class="flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full">
-                ${Math.floor(Math.random() * 5000 + 1000)}人已加入
+              <div class="flex flex-col items-end gap-2">
+                <div class="flex items-center gap-2 text-sm font-black text-emerald-600 bg-emerald-50 px-4 py-2 rounded-full border border-emerald-100 uppercase tracking-tighter">
+                  ${city.participation.toLocaleString()}人
+                </div>
               </div>
-            </div>
-          </button>
-        `).join('')}
+            </button>
+          `).join('')}
+        </div>
       </div>
     </div>
   `;
@@ -219,74 +235,85 @@ function renderSelection() {
 function renderGame() {
   const g = state.game;
   const progress = (g.distance / g.targetDistance) * 100;
+  const team = state.selectedTeam || CITIES[0];
 
   stage.innerHTML = `
     <div class="absolute inset-0 bg-[#006241] overflow-hidden flex flex-col">
-      <div class="p-6 pt-12 flex justify-between items-center z-20 text-white">
+      <div class="p-12 pt-32 flex justify-between items-center z-20 text-white">
         <div class="flex flex-col">
-          <span class="text-[10px] font-bold opacity-70 uppercase tracking-widest">距离终点</span>
-          <span class="text-2xl font-black italic">${Math.max(0, Math.round(g.targetDistance - g.distance))}m</span>
+          <span class="text-sm font-bold opacity-70 uppercase tracking-widest mb-1">距离终点</span>
+          <span class="text-5xl font-black italic">${Math.max(0, Math.round(g.targetDistance - g.distance))}m</span>
         </div>
         <div class="flex flex-col items-end">
-          <span class="text-[10px] font-bold opacity-70 uppercase tracking-widest font-mono">用时</span>
-          <span class="text-2xl font-black italic">${g.time.toFixed(1)}s</span>
+          <span class="text-sm font-bold opacity-70 uppercase tracking-widest font-mono mb-1">当前耗时</span>
+          <span class="text-5xl font-black italic">${g.time.toFixed(1)}s</span>
         </div>
       </div>
-      <div class="px-6 z-20">
-        <div class="h-1.5 w-full bg-white/20 rounded-full overflow-hidden">
-          <div class="h-full bg-[#E23D28] transition-all duration-300" style="width: ${progress}%"></div>
+      <div class="px-16 z-20 mt-4">
+        <div class="h-4 w-full bg-black/20 rounded-full overflow-hidden shadow-inner border border-white/10">
+          <div class="h-full bg-gradient-to-r from-yellow-400 to-red-500 transition-all duration-300 shadow-[0_0_20px_rgba(240,173,78,0.6)]" style="width: ${progress}%"></div>
         </div>
       </div>
-      <div class="flex-1 relative overflow-hidden bg-[url('https://www.transparenttextures.com/patterns/water.png')] bg-repeat">
-        <div class="absolute top-4 left-0 w-full flex justify-center z-30">
-          <div class="bg-white/10 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold text-white border border-white/20">
+      
+      <div class="flex-1 relative overflow-hidden">
+        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/water.png')] bg-repeat opacity-30 animate-pulse"></div>
+        
+        <div class="absolute top-12 left-0 w-full flex justify-center z-30">
+          <div class="bg-white/10 backdrop-blur-md px-8 py-3 rounded-full text-lg font-bold text-white border border-white/20 shadow-2xl flex items-center gap-3">
+            <div class="w-3 h-3 rounded-full bg-emerald-400 animate-ping"></div>
             战队在线奖励: 速度 +5%
           </div>
         </div>
         
         <div class="absolute bottom-1/4 left-1/2 -translate-x-1/2 animate-bounce">
-          <div class="boat-visual w-12 h-64 rounded-full relative" style="background-color: ${state.selectedTeam.color}">
-            <div class="boat-head absolute top-0 w-full h-12 bg-red-600 rounded-t-full flex items-center justify-center">
-               <div class="dragon-eye w-2 h-2 rounded-full bg-yellow-400"></div>
+          <div class="boat-visual w-32 h-[600px] rounded-full relative" style="background-color: ${team.color}">
+            <div class="boat-head absolute top-0 w-full h-32 bg-red-600 rounded-t-full flex items-center justify-center border-b-4 border-black/10">
+               <div class="dragon-eye w-6 h-6 rounded-full bg-yellow-400 shadow-[0_0_15px_#facc15]"></div>
             </div>
           </div>
           
           ${g.target ? `
-            <div class="absolute -top-44 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
-              <div class="flex gap-6">
+            <div class="absolute -top-[350px] left-1/2 -translate-x-1/2 flex flex-col items-center gap-6">
+              <div class="flex gap-16">
                 ${(g.target === 'left' || g.target === 'both') ? `
-                  <div class="w-16 h-16 bg-[#E23D28] border-4 border-white rounded-2xl flex items-center justify-center font-black text-white shadow-xl text-2xl">左</div>
+                  <div class="w-40 h-40 bg-[#E23D28] border-[10px] border-white rounded-[40px] flex items-center justify-center font-black text-white shadow-[0_20px_40px_rgba(226,61,40,0.5)] text-7xl">左</div>
                 ` : ''}
                 ${(g.target === 'right' || g.target === 'both') ? `
-                  <div class="w-16 h-16 bg-[#E23D28] border-4 border-white rounded-2xl flex items-center justify-center font-black text-white shadow-xl text-2xl">右</div>
+                  <div class="w-40 h-40 bg-[#E23D28] border-[10px] border-white rounded-[40px] flex items-center justify-center font-black text-white shadow-[0_20px_40px_rgba(226,61,40,0.5)] text-7xl">右</div>
                 ` : ''}
               </div>
-              <div class="bg-black/40 backdrop-blur-sm px-3 py-1 rounded text-white text-xs font-bold tracking-widest uppercase">
-                ${g.target === 'both' ? '同时划!' : '击鼓!'}
+              <div class="bg-black/70 backdrop-blur-md px-12 py-5 rounded-2xl text-white text-3xl font-black tracking-[0.4em] uppercase border border-white/20 whitespace-nowrap shadow-2xl">
+                ${g.target === 'both' ? '双桨齐划!' : '击鼓竞渡!'}
               </div>
             </div>
           ` : ''}
         </div>
 
         ${g.combo > 5 ? `
-          <div class="absolute top-1/2 right-6 -translate-y-1/2 text-right">
-            <div class="text-4xl font-black italic text-yellow-400 drop-shadow-lg">${g.combo}</div>
-            <div class="text-[10px] text-white font-bold opacity-50">COMBO</div>
+          <div class="absolute top-1/2 right-12 -translate-y-1/2 text-right">
+            <div class="text-8xl font-black italic text-yellow-400 drop-shadow-[0_4px_10px_rgba(0,0,0,0.5)] animate-pulse">${g.combo}</div>
+            <div class="text-xl text-white font-black opacity-70 tracking-widest leading-none">COMBO</div>
           </div>
         ` : ''}
 
         ${g.countdown > 0 ? `
           <div class="absolute inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center">
-            <div class="text-8xl font-black italic text-white animate-ping">${g.countdown}</div>
+            <div class="text-[200px] font-black italic text-white animate-ping drop-shadow-2xl">${g.countdown}</div>
           </div>
         ` : ''}
       </div>
-      <div class="h-1/3 bg-stone-900 grid grid-cols-2 gap-px border-t border-white/10 relative">
-        <button id="drum-l" class="active:bg-red-900/50 flex flex-col items-center justify-center text-white transition-colors gap-2">
-          <div class="w-16 h-16 rounded-full border-4 border-red-500 flex items-center justify-center"><span class="text-2xl font-black">左</span></div>
+      <div class="h-2/5 bg-stone-900 grid grid-cols-2 gap-px border-t border-white/10 relative overflow-hidden">
+        <button id="drum-l" class="active:bg-red-500/20 flex flex-col items-center justify-center text-white transition-all gap-5 select-none relative overflow-hidden">
+          <div class="w-48 h-48 rounded-full border-8 border-red-500 flex items-center justify-center shadow-[0_0_40px_rgba(239,68,68,0.4)] transition-transform active:scale-90 bg-red-950/20">
+            <span class="text-7xl font-black">左</span>
+          </div>
+          <div class="text-stone-500 font-bold uppercase tracking-[0.4em] text-lg">LEFT DRUM</div>
         </button>
-        <button id="drum-r" class="active:bg-blue-900/50 flex flex-col items-center justify-center text-white transition-colors gap-2">
-          <div class="w-16 h-16 rounded-full border-4 border-blue-500 flex items-center justify-center"><span class="text-2xl font-black">右</span></div>
+        <button id="drum-r" class="active:bg-blue-500/20 flex flex-col items-center justify-center text-white transition-all gap-5 select-none relative overflow-hidden">
+          <div class="w-48 h-48 rounded-full border-8 border-blue-500 flex items-center justify-center shadow-[0_0_40px_rgba(59,130,246,0.4)] transition-transform active:scale-90 bg-blue-950/20">
+            <span class="text-7xl font-black">右</span>
+          </div>
+          <div class="text-stone-500 font-bold uppercase tracking-[0.4em] text-lg">RIGHT DRUM</div>
         </button>
       </div>
     </div>
@@ -299,49 +326,49 @@ function renderGame() {
 }
 
 function renderResult() {
-  const r = state.lastResult;
-  const t = state.selectedTeam;
+  const r = state.lastResult || { time: 0, distance: 0, combo: 0 };
+  const t = state.selectedTeam || CITIES[0];
   
   stage.innerHTML = `
-    <div class="h-full bg-[#0047AB] flex flex-col items-center p-8 overflow-y-auto pt-12">
+    <div class="h-full bg-[#0047AB] flex flex-col items-center p-12 overflow-y-auto pt-24 pb-32">
       <!-- Result Poster (9:16) -->
-      <div class="w-full shrink-0 aspect-[9/16] bg-white rounded-3xl p-8 mb-8 shadow-2xl relative overflow-hidden flex flex-col justify-between border-4 border-white/50">
+      <div class="w-[600px] shrink-0 aspect-[9/16] bg-white rounded-[56px] p-12 mb-12 shadow-2xl relative overflow-hidden flex flex-col justify-between border-[10px] border-white/40">
         <div class="relative z-10">
-          <div class="flex justify-between items-start mb-6">
-            <div class="bg-stone-900 text-white px-3 py-1 rounded text-[10px] font-black uppercase">China Blue · 2024</div>
+          <div class="flex justify-between items-start mb-14">
+            <div class="bg-stone-900 text-white px-6 py-2 rounded-xl text-base font-black uppercase tracking-widest shadow-xl">China Blue · 2024</div>
           </div>
-          <div class="flex flex-col gap-1">
-            <span class="text-xs font-bold text-[#E23D28] tracking-widest uppercase">Zhejiang Dragon Boat</span>
-            <h3 class="text-4xl font-black text-stone-900 leading-tight">竞渡争锋<br />凯旋临门</h3>
+          <div class="flex flex-col gap-4">
+            <span class="text-lg font-black text-[#E23D28] tracking-[0.3em] uppercase opacity-80">Zhejiang Dragon Boat</span>
+            <h3 class="text-6xl font-black text-stone-900 leading-tight tracking-tighter">竞渡争锋<br />凯旋临门</h3>
           </div>
         </div>
 
-        <div class="relative z-10 flex flex-col gap-8">
-          <div class="grid grid-cols-1 gap-6">
-            <div class="flex flex-col border-l-4 border-[#E23D28] pl-4">
-              <span class="text-[10px] font-bold text-stone-400 uppercase">竞速成绩 / Time</span>
-              <span class="text-5xl font-black text-stone-900 font-mono tracking-tighter">${r.time.toFixed(2)}s</span>
-            </div>
+        <div class="relative z-10 flex flex-col gap-10">
+          <div class="flex flex-col border-l-[8px] border-[#E23D28] pl-8">
+            <span class="text-base font-bold text-stone-400 uppercase tracking-widest mb-2">竞速成绩 / Time</span>
+            <span class="text-7xl font-black text-stone-900 font-mono tracking-tighter drop-shadow-sm">${r.time.toFixed(2)}s</span>
           </div>
 
-          <div class="border-t border-stone-100 pt-6 flex flex-col gap-2 relative z-10">
-            <div class="flex justify-between items-center text-sm">
-              <span class="text-stone-500 font-medium">战队 / Team</span>
-              <span class="font-bold text-stone-900">${t.name} · ${t.teamName}</span>
+          <div class="border-t-2 border-stone-100 pt-8 flex flex-col gap-5 relative z-10">
+            <div class="flex justify-between items-center">
+              <span class="text-stone-400 font-bold text-lg uppercase tracking-widest">战队 / Team</span>
+              <span class="font-black text-stone-900 text-xl">${t.name} · ${t.teamName}</span>
             </div>
-            <div class="flex justify-between items-center text-sm">
-               <span class="text-stone-500 font-medium">日期 / Date</span>
-               <span class="font-bold text-stone-900">2024.06.10</span>
+            <div class="flex justify-between items-center">
+               <span class="text-stone-400 font-bold text-lg uppercase tracking-widest">日期 / Date</span>
+               <span class="font-black text-stone-900 text-xl">2024.06.10</span>
             </div>
           </div>
         </div>
+        
+
       </div>
 
-      <div class="flex flex-col w-full gap-4 pb-12">
-        <button class="w-full bg-[#E23D28] hover:bg-red-700 text-white font-bold py-5 rounded-2xl shadow-lg">分享我的战报</button>
-        <div class="flex gap-4">
-          <button id="btn-restart" class="flex-1 bg-white/10 text-white font-medium py-4 rounded-2xl flex items-center justify-center gap-2">再赛一场</button>
-          <button id="btn-rankings" class="flex-1 bg-white/10 text-white font-medium py-4 rounded-2xl flex items-center justify-center gap-2">榜单</button>
+      <div class="flex flex-col w-[620px] gap-8">
+        <button class="w-full bg-[#E23D28] hover:bg-red-700 text-white font-black py-10 rounded-[40px] shadow-[0_30px_60px_rgba(226,61,40,0.4)] text-3xl transition-transform active:scale-95 border-b-8 border-red-900/50">分享我的战报</button>
+        <div class="flex gap-8">
+          <button id="btn-restart" class="flex-1 bg-white/10 text-white font-black py-8 rounded-[32px] flex items-center justify-center gap-4 text-2xl border-2 border-white/20 active:bg-white/20 transition-all">再赛一场</button>
+          <button id="btn-rankings" class="flex-1 bg-white/10 text-white font-black py-8 rounded-[32px] flex items-center justify-center gap-4 text-2xl border-2 border-white/20 active:bg-white/20 transition-all">龙舟英雄榜</button>
         </div>
       </div>
     </div>
@@ -351,27 +378,70 @@ function renderResult() {
 }
 
 function renderRankings() {
+  const isSpeed = state.rankingTab === 'speed';
+  
   stage.innerHTML = `
-    <div class="h-full bg-stone-50 flex flex-col overflow-hidden">
-      <div class="p-6 pt-12 flex items-center gap-4 bg-white border-b">
-        <button id="btn-back" class="text-stone-400">返回</button>
-        <h2 class="text-2xl font-black text-stone-900 italic">实时排行榜</h2>
-      </div>
-      <div class="flex-1 overflow-y-auto px-6 pt-4 pb-12 space-y-3">
-        ${[1,2,3,4,5].map(i => `
-          <div class="flex items-center p-5 bg-white border rounded-2xl shadow-sm">
-            <div class="w-10 h-10 rounded-full bg-stone-100 flex items-center justify-center font-black italic mr-4">${i < 4 ? ['🥇','🥈','🥉'][i-1] : i}</div>
-            <div class="flex-1">
-              <div class="font-bold">用户*竞渡</div>
-              <div class="text-[10px] text-stone-400 uppercase">杭州战队</div>
-            </div>
-            <div class="text-stone-900 font-mono font-bold">18.${i*2}s</div>
+    <div class="h-full bg-stone-50 flex flex-col items-center overflow-hidden">
+      <div class="w-full p-12 pt-24 flex flex-col gap-8 bg-white border-b shrink-0 shadow-sm relative z-10 items-center">
+        <div class="w-[600px]">
+          <div class="flex items-center gap-6 mb-8">
+            <button id="btn-back" class="text-stone-400 hover:text-stone-900 transition-colors">
+              <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"></path></svg>
+            </button>
+            <h2 class="text-5xl font-black text-stone-900 italic tracking-tighter">龙舟英雄榜</h2>
           </div>
-        `).join('')}
+          <div class="flex p-2 bg-stone-100 rounded-3xl border border-stone-200">
+            <button id="tab-speed" class="flex-1 py-5 text-2xl font-black rounded-2xl transition-all duration-300 ${isSpeed ? 'bg-white text-[#E23D28] shadow-xl' : 'text-stone-400 opacity-60'}">
+              个人竞速
+            </button>
+            <button id="tab-popularity" class="flex-1 py-5 text-2xl font-black rounded-2xl transition-all duration-300 ${!isSpeed ? 'bg-white text-[#E23D28] shadow-xl' : 'text-stone-400 opacity-60'}">
+              战队人气
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="flex-1 overflow-y-auto w-full flex flex-col items-center px-8 pt-8 pb-24 space-y-4">
+        <div class="w-[600px] flex flex-col gap-4">
+          ${isSpeed ? (
+            [1,2,3,4,5,6,7,8,9,10].map(i => `
+              <div class="flex items-center p-8 bg-white border-2 border-stone-100 rounded-[32px] shadow-sm hover:border-red-100 transition-all">
+                <div class="w-16 h-16 rounded-2xl bg-stone-50 flex items-center justify-center font-black italic mr-6 text-3xl shadow-inner border border-stone-100">${i < 4 ? ['🥇','🥈','🥉'][i-1] : i}</div>
+                <div class="flex-1">
+                  <div class="font-black text-3xl text-stone-900 mb-1">用户*${Math.floor(Math.random()*9000+1000)}</div>
+                  <div class="text-sm font-black text-stone-400 uppercase tracking-widest">${CITIES[i % CITIES.length].name}战队</div>
+                </div>
+                <div class="text-stone-900 font-mono font-black text-4xl italic">18.${i*2 + Math.floor(Math.random()*9)}s</div>
+              </div>
+            `).join('')
+          ) : (
+            [...CITIES].sort((a, b) => b.participation - a.participation).map((city, i) => `
+              <div class="flex items-center p-8 bg-white border-2 border-stone-100 rounded-[32px] shadow-sm hover:border-red-100 transition-all">
+                <div class="w-16 h-16 rounded-2xl bg-stone-50 flex items-center justify-center font-black italic mr-6 text-3xl shadow-inner border border-stone-100">${i < 4 ? ['🥇','🥈','🥉'][i-1] : i + 1}</div>
+                <div class="flex-1">
+                  <div class="font-black text-3xl text-stone-900 mb-1">${city.teamName}</div>
+                  <div class="text-sm font-black text-stone-400 uppercase tracking-widest">${city.name}盟会</div>
+                </div>
+                <div class="flex flex-col items-end">
+                  <div class="text-[#059669] font-black text-3xl">${city.participation.toLocaleString()}</div>
+                  <div class="text-xs text-stone-400 font-black uppercase tracking-[0.2em]">参与人次</div>
+                </div>
+              </div>
+            `).join('')
+          )}
+        </div>
       </div>
     </div>
   `;
+  
   document.getElementById('btn-back').onclick = () => navigateTo('home');
+  document.getElementById('tab-speed').onclick = () => {
+    state.rankingTab = 'speed';
+    render();
+  };
+  document.getElementById('tab-popularity').onclick = () => {
+    state.rankingTab = 'popularity';
+    render();
+  };
 }
 
 // Initial Render
