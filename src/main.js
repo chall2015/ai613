@@ -178,15 +178,23 @@ function renderHome() {
         <button id="btn-start" class="w-full bg-[#E23D28] hover:bg-red-700 text-white font-black py-8 rounded-[40px] shadow-[0_30px_60px_-15px_rgba(226,61,40,0.6)] text-4xl tracking-[0.5em] transition-all active:scale-95 border-b-8 border-red-900/50">
           立即参赛
         </button>
-        <div class="flex gap-6 w-full">
-          <button id="btn-rank" class="flex-1 bg-white/10 backdrop-blur-md hover:bg-white/20 text-white py-6 rounded-[32px] flex items-center justify-center gap-4 text-xl font-black border border-white/10 transition-all">
-            排行榜
-          </button>
-          <button class="flex-1 bg-white/10 backdrop-blur-md hover:bg-white/20 text-white py-6 rounded-[32px] flex items-center justify-center gap-4 text-xl font-black border border-white/10 transition-all">
-            比赛规则
-          </button>
-        </div>
+        <button id="btn-quiz" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-6 rounded-[32px] shadow-xl text-2xl tracking-[0.2em] transition-all active:scale-95 border-b-4 border-emerald-900/40 flex items-center justify-center gap-3">
+          <span class="text-3xl">📝</span> 端午知识大比拼
+        </button>
       </div>
+
+      <!-- Side Bar -->
+      <div class="absolute right-6 top-1/2 -translate-y-1/2 flex flex-col gap-6 z-20">
+        <button id="btn-rank" class="w-20 h-20 bg-white/10 backdrop-blur-md rounded-2xl flex flex-col items-center justify-center border border-white/20 shadow-lg hover:bg-white/20 transition-all active:scale-90">
+          <span class="text-2xl mb-1">📊</span>
+          <span class="text-[10px] font-black tracking-tighter">排行榜</span>
+        </button>
+        <button id="btn-rules" class="w-20 h-20 bg-white/10 backdrop-blur-md rounded-2xl flex flex-col items-center justify-center border border-white/20 shadow-lg hover:bg-white/20 transition-all active:scale-90">
+          <span class="text-2xl mb-1">📜</span>
+          <span class="text-[10px] font-black tracking-tighter">比赛规则</span>
+        </button>
+      </div>
+
       <div class="text-white/40 text-sm flex flex-col items-center gap-2 z-10">
         <p class="font-bold tracking-widest opacity-60">© 2024 浙江广播电视集团 中国蓝</p>
       </div>
@@ -194,6 +202,8 @@ function renderHome() {
   `;
   document.getElementById('btn-start').onclick = () => navigateTo('select');
   document.getElementById('btn-rank').onclick = () => navigateTo('rankings');
+  document.getElementById('btn-quiz').onclick = () => alert('端午答题功能即将上线！');
+  document.getElementById('btn-rules').onclick = () => alert('划船机说明：通过左右击鼓控制龙舟，躲避障碍，冲向终点！');
 }
 
 function renderSelection() {
