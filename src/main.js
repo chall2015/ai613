@@ -123,6 +123,8 @@ function endGame() {
 
 // Rendering Engine
 function render() {
+  // Always ensure base stage classes
+  stage.className = "stage";
   stage.innerHTML = '';
   
   switch(state.currentPage) {
@@ -145,7 +147,6 @@ function render() {
 }
 
 function renderHome() {
-  stage.className = "w-full max-w-[430px] aspect-[750/1624] bg-stone-50 overflow-hidden relative shadow-2xl flex flex-col";
   stage.innerHTML = `
     <div class="h-full bg-gradient-to-b from-[#0047AB] to-[#002868] flex flex-col items-center justify-between p-8 pb-16 text-white overflow-hidden relative">
       <div class="absolute bottom-0 left-0 w-full h-1/3 opacity-20 pointer-events-none">
@@ -243,16 +244,25 @@ function renderGame() {
           </div>
         </div>
         
-        <div class="absolute bottom-1/4 left-1/2 -translate-x-1/2 transition-transform duration-300">
-          <div class="w-12 h-64 rounded-full shadow-2xl relative" style="background-color: ${state.selectedTeam.color}">
-            <div class="absolute top-0 w-full h-12 bg-red-600 rounded-t-full"></div>
+        <div class="absolute bottom-1/4 left-1/2 -translate-x-1/2 animate-bounce">
+          <div class="boat-visual w-12 h-64 rounded-full relative" style="background-color: ${state.selectedTeam.color}">
+            <div class="boat-head absolute top-0 w-full h-12 bg-red-600 rounded-t-full flex items-center justify-center">
+               <div class="dragon-eye w-2 h-2 rounded-full bg-yellow-400"></div>
+            </div>
           </div>
           
           ${g.target ? `
-            <div class="absolute -top-40 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-bounce">
+            <div class="absolute -top-44 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
               <div class="flex gap-6">
-                ${(g.target === 'left' || g.target === 'both') ? '<div class="w-16 h-16 bg-[#E23D28] border-4 border-white rounded-2xl flex items-center justify-center font-black text-white shadow-xl text-2xl">左</div>' : ''}
-                ${(g.target === 'right' || g.target === 'both') ? '<div class="w-16 h-16 bg-[#E23D28] border-4 border-white rounded-2xl flex items-center justify-center font-black text-white shadow-xl text-2xl">右</div>' : ''}
+                ${(g.target === 'left' || g.target === 'both') ? `
+                  <div class="w-16 h-16 bg-[#E23D28] border-4 border-white rounded-2xl flex items-center justify-center font-black text-white shadow-xl text-2xl">左</div>
+                ` : ''}
+                ${(g.target === 'right' || g.target === 'both') ? `
+                  <div class="w-16 h-16 bg-[#E23D28] border-4 border-white rounded-2xl flex items-center justify-center font-black text-white shadow-xl text-2xl">右</div>
+                ` : ''}
+              </div>
+              <div class="bg-black/40 backdrop-blur-sm px-3 py-1 rounded text-white text-xs font-bold tracking-widest uppercase">
+                ${g.target === 'both' ? '同时划!' : '击鼓!'}
               </div>
             </div>
           ` : ''}
