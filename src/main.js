@@ -160,10 +160,6 @@ function renderHome() {
         <div class="water-wave h-full w-full bg-[url('https://www.transparenttextures.com/patterns/waves.png')] animate-pulse"></div>
       </div>
       <div class="flex flex-col items-center pt-32 z-10 w-full px-6">
-        <div class="bg-white/10 backdrop-blur-md px-8 py-3 rounded-full text-lg font-black mb-8 flex items-center gap-4 border border-white/20">
-          <div class="w-4 h-4 rounded-full bg-red-500 animate-ping shadow-[0_0_15px_#ef4444]"></div>
-          浙江广电 · 中国蓝
-        </div>
         <h1 class="text-7xl font-black text-center tracking-tighter mb-4 drop-shadow-2xl italic leading-tight">中国蓝龙舟赛</h1>
         <p class="text-stone-300 text-center text-2xl font-light tracking-widest opacity-80">浙里龙舟竞风流 · 端午安康</p>
       </div>
@@ -194,10 +190,6 @@ function renderHome() {
           <span class="text-[10px] font-black tracking-tighter">比赛规则</span>
         </button>
       </div>
-
-      <div class="text-white/40 text-sm flex flex-col items-center gap-2 z-10">
-        <p class="font-bold tracking-widest opacity-60">© 2024 浙江广播电视集团 中国蓝</p>
-      </div>
     </div>
   `;
   document.getElementById('btn-start').onclick = () => navigateTo('select');
@@ -208,26 +200,52 @@ function renderHome() {
 
 function renderSelection() {
   stage.innerHTML = `
-    <div class="h-full bg-stone-50 flex flex-col items-center p-10 overflow-y-auto pb-24">
+    <div class="h-full bg-stone-50 flex flex-col items-center p-12 overflow-y-auto pb-24">
       <div class="w-[600px]">
-        <div class="mb-10 pt-10">
-          <h2 class="text-5xl font-black text-stone-900 tracking-tighter italic">选择战队</h2>
-          <p class="text-stone-500 mt-3 text-xl font-medium">集结全省之力，为家乡荣誉而战！</p>
+        <!-- Select Header -->
+        <div class="w-full flex items-center gap-6 mb-8 pt-6">
+          <button id="btn-back-select" class="text-stone-400 hover:text-stone-900 transition-colors p-3 bg-white rounded-2xl border border-stone-200 shadow-sm active:scale-90 flex items-center justify-center">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path></svg>
+          </button>
+          <div class="flex-1">
+            <h2 class="text-4xl font-black text-stone-900 tracking-tighter italic">选择参赛战队</h2>
+            <p class="text-stone-500 mt-1 text-lg font-medium">浙里龙舟竞风流 · 为家乡荣誉而战！</p>
+          </div>
         </div>
-        <div class="grid grid-cols-1 gap-5">
+
+        <!-- 2-Column Bento Grid representing the cities -->
+        <div class="grid grid-cols-2 gap-4">
           ${CITIES.map(city => `
-            <button onclick="window.selectCity('${city.id}')" class="group relative flex items-center p-8 bg-white border-2 border-stone-100 rounded-[40px] shadow-md hover:border-blue-300 hover:shadow-xl transition-all text-left overflow-hidden active:scale-95">
-              <div class="absolute left-0 top-0 bottom-0 w-3" style="background-color: ${city.color}"></div>
-              <div class="flex-1">
-                <div class="flex items-center gap-4 mb-2">
-                  <span class="text-4xl font-black text-stone-900">${city.name}</span>
-                  <span class="px-3 py-1 bg-stone-100 rounded-lg text-sm font-black text-stone-500 uppercase tracking-widest">${city.teamName}</span>
+            <button onclick="window.selectCity('${city.id}')" 
+              class="group relative flex flex-col justify-between p-6 rounded-[32px] bg-white border-2 transition-all text-left overflow-hidden active:scale-95 h-56 shadow-sm hover:shadow-lg"
+              style="border-color: #f5f5f4; background: linear-gradient(135deg, ${city.color}08 0%, #ffffff 100%)"
+              onmouseover="this.style.borderColor='${city.color}40'; this.style.boxShadow='0 12px 20px -8px ${city.color}20';"
+              onmouseout="this.style.borderColor='#f5f5f4'; this.style.boxShadow='none';">
+              
+              <!-- Color Indicator Line -->
+              <div class="absolute left-0 top-0 bottom-0 w-2.5" style="background-color: ${city.color}"></div>
+              
+              <!-- Card Top -->
+              <div class="w-full pl-2">
+                <div class="flex justify-between items-start">
+                  <div class="flex flex-col">
+                    <span class="text-3xl font-black text-stone-900 tracking-tight">${city.name}</span>
+                    <span class="mt-1 text-xs font-bold text-stone-400 tracking-widest uppercase">${city.teamName}</span>
+                  </div>
+                  <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs shadow-inner" style="background-color: ${city.color}15; color: ${city.color}">
+                    🛶
+                  </div>
                 </div>
-                <p class="text-lg text-stone-400 font-medium">${city.landmark}</p>
               </div>
-              <div class="flex flex-col items-end gap-2">
-                <div class="flex items-center gap-2 text-sm font-black text-emerald-600 bg-emerald-50 px-4 py-2 rounded-full border border-emerald-100 uppercase tracking-tighter">
-                  ${city.participation.toLocaleString()}人
+
+              <!-- Card Bottom -->
+              <div class="w-full pl-2 mt-auto">
+                <div class="text-stone-400 text-xs font-semibold flex items-center gap-1 mb-3">
+                  <span class="opacity-75">📍</span> ${city.landmark}
+                </div>
+                <div class="flex justify-between items-center bg-stone-50/80 group-hover:bg-white px-3 py-1.5 rounded-xl border border-stone-100 transition-colors">
+                  <span class="text-[10px] font-bold text-stone-400 tracking-wider">累计人气</span>
+                  <span class="text-xs font-black text-stone-700" style="color: ${city.color}">${city.participation.toLocaleString()}</span>
                 </div>
               </div>
             </button>
@@ -236,6 +254,7 @@ function renderSelection() {
       </div>
     </div>
   `;
+  document.getElementById('btn-back-select').onclick = () => navigateTo('home');
   window.selectCity = (id) => {
     state.selectedTeam = CITIES.find(c => c.id === id);
     navigateTo('game');
@@ -345,7 +364,7 @@ function renderResult() {
       <div class="w-[600px] shrink-0 aspect-[9/16] bg-white rounded-[56px] p-12 mb-12 shadow-2xl relative overflow-hidden flex flex-col justify-between border-[10px] border-white/40">
         <div class="relative z-10">
           <div class="flex justify-between items-start mb-14">
-            <div class="bg-stone-900 text-white px-6 py-2 rounded-xl text-base font-black uppercase tracking-widest shadow-xl">China Blue · 2024</div>
+            <div class="bg-stone-900 text-white px-6 py-2 rounded-xl text-base font-black uppercase tracking-widest shadow-xl">China Blue · 2026</div>
           </div>
           <div class="flex flex-col gap-4">
             <span class="text-lg font-black text-[#E23D28] tracking-[0.3em] uppercase opacity-80">Zhejiang Dragon Boat</span>
@@ -366,7 +385,7 @@ function renderResult() {
             </div>
             <div class="flex justify-between items-center">
                <span class="text-stone-400 font-bold text-lg uppercase tracking-widest">日期 / Date</span>
-               <span class="font-black text-stone-900 text-xl">2024.06.10</span>
+               <span class="font-black text-stone-900 text-xl">2026.06.10</span>
             </div>
           </div>
         </div>
@@ -392,19 +411,16 @@ function renderRankings() {
   
   stage.innerHTML = `
     <div class="h-full bg-stone-50 flex flex-col items-center overflow-hidden">
-      <div class="w-full p-12 pt-24 flex flex-col gap-8 bg-white border-b shrink-0 shadow-sm relative z-10 items-center">
-        <div class="w-[600px]">
-          <div class="flex items-center gap-6 mb-8">
-            <button id="btn-back" class="text-stone-400 hover:text-stone-900 transition-colors">
-              <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"></path></svg>
-            </button>
-            <h2 class="text-5xl font-black text-stone-900 italic tracking-tighter">龙舟英雄榜</h2>
-          </div>
-          <div class="flex p-2 bg-stone-100 rounded-3xl border border-stone-200">
-            <button id="tab-speed" class="flex-1 py-5 text-2xl font-black rounded-2xl transition-all duration-300 ${isSpeed ? 'bg-white text-[#E23D28] shadow-xl' : 'text-stone-400 opacity-60'}">
+      <div class="w-full py-6 pt-12 bg-white border-b shrink-0 shadow-sm relative z-10 flex justify-center">
+        <div class="w-[600px] flex items-center gap-4 px-6">
+          <button id="btn-back" class="text-stone-400 hover:text-stone-900 transition-colors p-2 shrink-0">
+            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"></path></svg>
+          </button>
+          <div class="flex-1 flex p-1.5 bg-stone-100 rounded-2xl border border-stone-200">
+            <button id="tab-speed" class="flex-1 py-3 text-xl font-black rounded-xl transition-all duration-300 ${isSpeed ? 'bg-white text-[#E23D28] shadow-md' : 'text-stone-400 opacity-60'}">
               个人竞速
             </button>
-            <button id="tab-popularity" class="flex-1 py-5 text-2xl font-black rounded-2xl transition-all duration-300 ${!isSpeed ? 'bg-white text-[#E23D28] shadow-xl' : 'text-stone-400 opacity-60'}">
+            <button id="tab-popularity" class="flex-1 py-3 text-xl font-black rounded-xl transition-all duration-300 ${!isSpeed ? 'bg-white text-[#E23D28] shadow-md' : 'text-stone-400 opacity-60'}">
               战队人气
             </button>
           </div>
@@ -426,7 +442,7 @@ function renderRankings() {
           ) : (
             [...CITIES].sort((a, b) => b.participation - a.participation).map((city, i) => `
               <div class="flex items-center p-8 bg-white border-2 border-stone-100 rounded-[32px] shadow-sm hover:border-red-100 transition-all">
-                <div class="w-16 h-16 rounded-2xl bg-stone-50 flex items-center justify-center font-black italic mr-6 text-3xl shadow-inner border border-stone-100">${i < 4 ? ['🥇','🥈','🥉'][i-1] : i + 1}</div>
+                <div class="w-16 h-16 rounded-2xl bg-stone-50 flex items-center justify-center font-black italic mr-6 text-3xl shadow-inner border border-stone-100">${i < 3 ? ['🥇','🥈','🥉'][i] : i + 1}</div>
                 <div class="flex-1">
                   <div class="font-black text-3xl text-stone-900 mb-1">${city.teamName}</div>
                   <div class="text-sm font-black text-stone-400 uppercase tracking-widest">${city.name}盟会</div>
